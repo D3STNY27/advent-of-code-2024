@@ -1,9 +1,5 @@
 import os
-import functools
 os.system('cls')
-
-
-DIRECTIONS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 
 
 def read_input_file(file_path: str) -> list[str]:
@@ -12,18 +8,18 @@ def read_input_file(file_path: str) -> list[str]:
         return [line.strip() for line in lines]
 
 
-@functools.cache
-def check_validity(test_value: int, values: list[int], current_eval: int, index: int):
+def check_validity(test_value: int, values: list[int], current_eval: str, index: int):
     if index==len(values)-1:
         return test_value==int(current_eval)
 
     if int(current_eval) > test_value:
         return False
     
-    valid_add = check_validity(test_value, values, f'{(int(current_eval) + int(values[index+1]))}', index+1)
-    valid_mul = check_validity(test_value, values, f'{(int(current_eval) * int(values[index+1]))}', index+1)
-    valid_concat = check_validity(test_value, values, current_eval + values[index+1], index+1)
-    return valid_add or valid_mul or valid_concat
+    return (
+        check_validity(test_value, values, f'{(int(current_eval) + int(values[index+1]))}', index+1) or
+        check_validity(test_value, values, f'{(int(current_eval) * int(values[index+1]))}', index+1) or
+        check_validity(test_value, values, current_eval + values[index+1], index+1)
+    )
 
 
 def solution(lines: str):

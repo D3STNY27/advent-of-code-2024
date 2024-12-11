@@ -2,9 +2,6 @@ import os
 os.system('cls')
 
 
-DIRECTIONS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-
-
 def read_input_file(file_path: str) -> list[str]:
     with open(file=file_path, mode="r") as input_file:
         lines = input_file.readlines()
@@ -18,9 +15,10 @@ def check_validity(test_value: int, values: list[int], current_eval: int, index:
     if current_eval > test_value:
         return False
     
-    valid_add = check_validity(test_value, values, current_eval + values[index+1], index+1)
-    valid_mul = check_validity(test_value, values, current_eval * values[index+1], index+1)
-    return valid_add or valid_mul
+    return (
+        check_validity(test_value, values, current_eval + values[index+1], index+1) or
+        check_validity(test_value, values, current_eval * values[index+1], index+1)
+    )
 
 
 def solution(lines: str):
