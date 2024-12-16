@@ -24,7 +24,6 @@ def solution(lines: list[str]):
                 end_position = (r, c)
     
     
-    came_from = {}
     init_direction = (0, 1)
     g_score = {(start_position, init_direction): 0}
     points_path_map = {}
@@ -63,7 +62,6 @@ def solution(lines: list[str]):
 
             
             if tentative_g_score <= g_score[((r_n, c_n), next_direction)]:
-                came_from[((r_n, c_n), next_direction)] = (current_position, current_direction)
                 g_score[((r_n, c_n), next_direction)] = tentative_g_score
                 queue.put(item=(points + cost, (r_n, c_n), next_direction, path + [(r_n, c_n)]))
     
