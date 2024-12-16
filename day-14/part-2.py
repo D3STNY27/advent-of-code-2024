@@ -22,25 +22,6 @@ def read_input_file(file_path: str) -> list[str]:
         return [line.strip() for line in lines]
 
 
-def get_quadrant(x: int, y: int):
-    if x == MID_W:
-        return
-    
-    if y == MID_H:
-        return
-    
-    if y < MID_H:
-        if x < MID_H:
-            return 1
-        else:
-            return 2
-    else:
-        if x < MID_H:
-            return 3
-        else:
-            return 4
-
-
 def solution(lines: list[str]):
     patterns = []
 
