@@ -55,7 +55,6 @@ def solution(lines: list[str]):
     
 
     total_picoseconds = len(path) - 1
-    saved_picoseconds_map = {}
 
 
     # Find Cheats
