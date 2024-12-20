@@ -1,4 +1,5 @@
 import os
+from time import perf_counter
 os.system('cls')
 
 
@@ -56,49 +57,25 @@ def solution(lines: list[str]):
     total_picoseconds = len(path) - 1
     saved_picoseconds_map = {}
 
+
     # Find Cheats
-    for node in path:
-        cheat_rs, cheat_cs = node
-        i = index_map[node]
+    total_count = 0
 
-        for direction in DIRECTIONS:
-            step_r, step_c = direction
+    for i in range(len(path)-1):
+        for j in range(i+1, len(path)):
+            node_a, node_b = path[i], path[j]
+            distance = abs(node_a[0] - node_b[0]) + abs(node_a[1] - node_b[1])
 
-            cheat_rm, cheat_cm = (cheat_rs + step_r), (cheat_cs + step_c)
-            if cheat_rm < 0 or cheat_rm >= len(lines) or cheat_cm < 0 or cheat_cm >= len(lines[0]):
+            if distance > 20:
                 continue
-
-            if lines[cheat_rm][cheat_cm] == '.':
-                continue
-
-            cheat_re, cheat_ce = (cheat_rm + step_r), (cheat_cm + step_c)
-            if cheat_re < 0 or cheat_re >= len(lines) or cheat_ce < 0 or cheat_ce >= len(lines[0]):
-                continue
-
-            if lines[cheat_re][cheat_ce] == '#':
-                continue
-
-            if (cheat_re, cheat_ce) not in index_map:
-                continue
-
-            end_index = index_map[(cheat_re, cheat_ce)]
-            if end_index < i:
-                continue
-
-            cheat_picoseconds = (i + 1) + 1 + (total_picoseconds - end_index)
+            
+            cheat_picoseconds = (i + 1) + distance + (total_picoseconds - j - 1)
             saved_picoseconds = (total_picoseconds - cheat_picoseconds)
 
-            if saved_picoseconds not in saved_picoseconds_map:
-                saved_picoseconds_map[saved_picoseconds] = 0
+            if saved_picoseconds < 100:
+                continue
 
-            saved_picoseconds_map[saved_picoseconds] += 1
-    
-
-    # Save Atleast 100 Picoseconds
-    total_count = 0
-    for key, value in saved_picoseconds_map.items():
-        if key >= 100:
-            total_count += value
+            total_count += 1
     
     print(total_count)
 
