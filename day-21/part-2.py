@@ -12,7 +12,7 @@ DIRECTIONS_SYMBOL_MAP = {
     (-1, 0): '^'
 }
 
-NUM_ROBOTS = 35
+NUM_ROBOTS = 25
 ROBOT_MOVE_MAP = {
     'A': {
         'A': 'A',
