@@ -1,4 +1,5 @@
 import os
+from functools import cache
 from queue import PriorityQueue
 
 os.system('cls')
@@ -9,6 +10,45 @@ DIRECTIONS_SYMBOL_MAP = {
     (0, -1): '<',
     (1, 0): 'v',
     (-1, 0): '^'
+}
+
+NUM_ROBOTS = 35
+ROBOT_MOVE_MAP = {
+    'A': {
+        'A': 'A',
+        '^': '<A',
+        '<': 'v<<A',
+        '>': 'vA',
+        'v': '<vA'
+    },
+    '^': {
+        'A': '>A',
+        '^': 'A',
+        '<': 'v<A',
+        '>': 'v>A',
+        'v': 'vA'
+    },
+    '<': {
+        'A': '>>^A',
+        '^': '>^A',
+        '<': 'A',
+        '>': '>>A',
+        'v': '>A'
+    },
+    'v': {
+        'A': '^>A',
+        '^': '^A',
+        '<': '<A',
+        '>': '>A',
+        'v': 'A'
+    },
+    '>': {
+        'A': '^A',
+        '^': '<^A',
+        '<': '<<A',
+        '>': 'A',
+        'v': '<A'
+    }
 }
 
 
@@ -98,57 +138,11 @@ class NumericKeypad:
         return move_list
 
 
-class DirectionalKeypad:
-    def __init__(self):
-        self.move_map = {
-            'A': {
-                'A': 'A',
-                '^': '<A',
-                '<': 'v<<A',
-                '>': 'vA',
-                'v': '<vA'
-            },
-            '^': {
-                'A': '>A',
-                '^': 'A',
-                '<': 'v<A',
-                '>': 'v>A',
-                'v': 'vA'
-            },
-            '<': {
-                'A': '>>^A',
-                '^': '>^A',
-                '<': 'A',
-                '>': '>>A',
-                'v': '>A'
-            },
-            'v': {
-                'A': '^>A',
-                '^': '^A',
-                '<': '<A',
-                '>': '>A',
-                'v': 'A'
-            },
-            '>': {
-                'A': '^A',
-                '^': '<^A',
-                '<': '<<A',
-                '>': 'A',
-                'v': '<A'
-            }
-        }
-    
-    
-    def get_moves(self, sequence: str):
-        moves = ''
-        previous_position = 'A'
+def read_input_file(file_path: str) -> list[str]:
+    with open(file=file_path, mode="r") as input_file:
+        lines = input_file.readlines()
+        return [line.strip() for line in lines]
 
-        for button in sequence:
-            moves += self.move_map[previous_position][button]
-            previous_position = button
-        
-        return moves
-    
 
 def get_consecutive_count(sequence: str):
     count = 0
@@ -182,10 +176,31 @@ def get_max_consecutive_sequences(sequence_list: list[str]):
     return sequence_count_map[max_consecutive_count]
 
 
-def read_input_file(file_path: str) -> list[str]:
-    with open(file=file_path, mode="r") as input_file:
-        lines = input_file.readlines()
-        return [line.strip() for line in lines]
+@cache
+def find_sequence_length_recursive(previous_button: str, current_button: str, robot_num: int):
+    if robot_num == NUM_ROBOTS:
+        return len(ROBOT_MOVE_MAP[previous_button][current_button])
+    
+    total_len = 0
+    
+    next_move_previous_button = 'A'
+    for button in ROBOT_MOVE_MAP[previous_button][current_button]:
+        total_len += find_sequence_length_recursive(next_move_previous_button, current_button=button, robot_num=robot_num+1)
+        next_move_previous_button = button
+    
+    return total_len
+
+
+def find_sequence_length(sequence: str):
+    total_len = 0
+    previous_button = 'A'
+
+    for current_button in sequence:
+        total_len += find_sequence_length_recursive(previous_button, current_button, 1)
+        previous_button = current_button
+    
+    return total_len
+
 
 
 def solution(lines: list[str]):
@@ -196,18 +211,19 @@ def solution(lines: list[str]):
         all_sequences = door.process_code(code=line)
         max_consecutive_sequences = get_max_consecutive_sequences(all_sequences)
 
-        robot = DirectionalKeypad()
-        robot_1_moves = [robot.get_moves(sequence) for sequence in max_consecutive_sequences]
-
-        robot = DirectionalKeypad()
-        robot_2_moves = [robot.get_moves(sequence) for sequence in robot_1_moves]
-
+        min_length = float('inf')
+        
+        for sequence in max_consecutive_sequences:
+            sequence_length = find_sequence_length(sequence)
+            if sequence_length < min_length:
+                min_length = sequence_length
+        
         code = int(line[:-1])
-        minimum_sequence_len = min([len(sequence) for sequence in robot_2_moves])
-        total_sum += (code * minimum_sequence_len)
-    
+        total_sum += (code * min_length)
+
     print(total_sum)
 
 
 lines = read_input_file(file_path="input.txt")
 solution(lines)
+print(find_sequence_length_recursive.cache_info())
