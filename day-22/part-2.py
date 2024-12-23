@@ -69,6 +69,6 @@ def solution(lines: list[str]):
     print(max_sum)
 
 
-lines = read_input_file(file_path="sample_input_2.txt")
+lines = read_input_file(file_path="input.txt")
 solution(lines)
 print(get_next_secret_number.cache_info())
